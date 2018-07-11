@@ -86,7 +86,7 @@ fridayy的基于phantomjs的xss扫描https://paper.seebug.org/93/
 
 与chrome通信的基本知识：
 简单说一下这套协议吧，这套协议通过 websocket 进行通信，发送和返回的内容都是 json 格式。发送的格式大概是这样：
-```json 
+```
 {
 "id": id,
 "method": command,
@@ -94,7 +94,7 @@ fridayy的基于phantomjs的xss扫描https://paper.seebug.org/93/
       }
 ```
 换成一个实际的例子可能是这样：
-```json
+```
 {"id": 1,
 "method: "Page.enable",
 "params": {}
@@ -112,7 +112,7 @@ http://localhost:9222/json/new
 http://localhost:9222/json/close/tab_id
 
 其中第一个 URL 是获取当前所有打开的 TAB 页，第二个是新建一个 TAB 页，第三个是根据 TAB 页的 id 关闭这个 TAB 页。 当我们请求第一个 URL 时，返回的内容大概如下：
-```json
+```
 [
 {
 "description": "",
@@ -190,7 +190,7 @@ chrome-canary --remote-debugging-port=9222 --headless -remote-debugging-address=
 三种不同的判断逻辑的结果：
 scan_result结果：
 
-```json
+```
 # level 3 代表触发了Page.javascriptDialogOpening事件
 {'url': u'http://xss.php', 'vul': 'xss', 'post': '', 'method': u'GET', 'level': '3'}
 # level 2 代表dom树的节点包含了我们自定义的<webscan></webscan>标签
