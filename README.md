@@ -43,7 +43,7 @@ payloads= payload)
 scan_result = chrome_headless_drive.run()
 ```
 scan_result结果：
-```json
+```
 # level 3 代表触发了Page.javascriptDialogOpening事件
 {'url': u'http://xss.php', 'vul': 'xss', 'post': '', 'method': u'GET', 'level': '3'}
 # level 2 代表dom树的节点包含了我们自定义的<webscan></webscan>标签
