@@ -206,7 +206,10 @@ scan_result结果：
 
 
 ## 总结及思考
+
 1、	其实使用websocket和chrome进行通信整个过程是异步的，使用异步的方法可以解决粗暴的通过超时来控制循环监听的问题，同时也能提高扫描效率。
+
 2、	在关闭了同源策略的情况下，可能会导致内网ssrf，所以要对传入参数进行处理。可以尝试用其他方法实现post请求，如在Network.requestWillBeSent时修改请求参数。
+
 3、	由于企业内部对qps有限制，我们扫描的payload数量会被限制的很少。不能进行fuzz，如果需要fuzz模块可以参考 https://github.com/bsmali4/xssfork 的fuzz模块进行payload的fuzz。
 
