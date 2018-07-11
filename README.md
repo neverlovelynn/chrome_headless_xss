@@ -80,12 +80,16 @@ fridayy的基于phantomjs的xss扫描https://paper.seebug.org/93/
 总体来说，headless chrome意思是无头chrome浏览器，相对于传统的chrome浏览器，这是一个可以在后台用命令行操作浏览器的工具，对于爬虫编写以及web自动化测试都有很大的作用。相比较同类工具Phantomjs，其更加强大（主要因为其依赖的webkit更新）。
 
 我认为核心的理解在于：
+
 1、	就是具有基于Chrome DevTools Protocol 的chrome远程调试功能的无界面浏览器。
+
 2、	现在的python和nodejs对chrome headless进行操作的封包都是基于Chrome DevTools Protocol来实现的。
 
 学习了一下：https://github.com/wilson9x1/ChromeHeadlessInterface 的项目后，决定自己使用webscoket和chrome进行通信。
 原因有以下几点：
+
 1、有现成的部分代码，但是不支持post，也不能监听dom的更改。所以需要自己读api去实现我们的功能。
+
 2、比较直观，可以通过本地远程调试端口看页面的变化。
 
 与chrome通信的基本知识：
@@ -111,6 +115,7 @@ fridayy的基于phantomjs的xss扫描https://paper.seebug.org/93/
 }
 ```
 几个关键的url：
+
 http://localhost:9222/json
 
 http://localhost:9222/json/new 
