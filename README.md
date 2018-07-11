@@ -66,8 +66,11 @@ fridayy的基于phantomjs的xss扫描https://paper.seebug.org/93/
 ![-w1349](media/15313231448237/15313271022749.jpg)
 
 判断xss的方法为：
+
 1、	监听页面的弹窗事件
+
 2、	查看dom中的localName是否有存在我们自定义的标签
+
 3、	查看dom中的nodeValue 是否含有我们输入的payload
 
 将其分为三个等级，分别为level 3 level 2 level 1 分别对应这xss的精确程度（由高到低）
