@@ -1,5 +1,3 @@
-# chrome_headless_xss
-A plugin to check xss by useing chrome_headless
 # **基于Chorme headless的xss检测**
 ##源码及使用方法
 Mac os 安装 chrome-canary：
@@ -60,7 +58,9 @@ scan_result结果：
 fridayy的基于phantomjs的xss扫描https://paper.seebug.org/93/
 
 以及猪猪侠的web2.0启发式爬虫实战
-![](media/15313231448237/15313235483980.jpg)
+
+![-w1349](media/15313231448237/15313271022749.jpg)
+
 判断xss的方法为：
 1、	监听页面的弹窗事件
 2、	查看dom中的localName是否有存在我们自定义的标签
@@ -139,7 +139,7 @@ http://localhost:9222/json/close/tab_id
 Page.navigate命令
 ![-w868](media/15313231448237/15313247280682.jpg)
 其socket返回包为
-```json
+```
 {"id":2,"result":{"frameId":"33320.1"}} {"method":"Page.frameNavigated","params":{"frame":
 {"id":"33320.1","loaderId":"33320.2","url":"http://x.x.x.x/a.html","securityOrigin":"http://x.x.x.x","mimeType":"text/html"}}}
  {"method":"Page.javascriptDialogOpening","params":
@@ -158,14 +158,14 @@ Page.navigate命令
 1、	监听页面的弹窗事件：
 通过循环监听Page.javascriptDialogOpening的结果，判断页面是否存在弹窗事件。
 其socket回包是：
-```json
+```
 {"method":"Page.javascriptDialogOpening","params":
 {"url":"http://xss.php","message":"1","type":"alert","hasBrowserHandler":false,"defaultPrompt":""}
 }
 ```
 2、	查看dom中的localName是否有存在我们自定义的标签
 通过循环监听DOM.getDocument的return来判断我们自定义的标签是否被解析。其数据包如下：
-```json
+```
 {"id":2324,"result":{"root":{"nodeId":30453,"backendNodeId":6,"nodeType":9,"nodeName":"#document","localName":"","nodeValue":"","childNodeCount":1,"children":[{"nodeId":30454,"parentId":30453,"backendNodeId":7,"nodeType":1,"nodeName":"HTML","localName":"html","nodeValue":"","childNodeCount":2,"children":[{"nodeId":30455,"parentId":30454,"backendNodeId":8,"nodeType":1,"nodeName":"HEAD","localName":"head","nodeValue":"","childNodeCount":0,"children":[],"attributes":[]},{"nodeId":30456,"parentId":30454,"backendNodeId":9,"nodeType":1,"nodeName":"BODY","localName":"body","nodeValue":"","childNodeCount":4,"children":[{"nodeId":30457,"parentId":30456,"backendNodeId":10,"nodeType":1,"nodeName":"TABLE","localName":"table","nodeValue":"","childNodeCount":1,"children":[{"nodeId":30458,"parentId":30457,"backendNodeId":11,"nodeType":1,"nodeName":"TBODY","localName":"tbody","nodeValue":"","childNodeCount":2,"children":[{"nodeId":30459,"parentId":30458,"backendNodeId":12,"nodeType":1,"nodeName":"TR","localName":"tr","nodeValue":"","childNodeCount":2,"children":[{"nodeId":30460,"parentId":30459,"backendNodeId":13,"nodeType":1,"nodeName":"TD","localName":"td","nodeValue":"","childNodeCount":1,"children":[{"nodeId":30461,"parentId":30460,"backendNodeId":14,"nodeType":3,"nodeName":"#text","localName":"","nodeValue":"id"}],"attributes":[]},{"nodeId":30462,"parentId":30459,"backendNodeId":15,"nodeType":1,"nodeName":"TD","localName":"td","nodeValue":"","childNodeCount":1,"children":[{"nodeId":30463,"parentId":30462,"backendNodeId":16,"nodeType":3,"nodeName":"#text","localName":"","nodeValue":"username"}],"attributes":[]}],"attributes":[]},{"nodeId":30464,"parentId":30458,"backendNodeId":17,"nodeType":1,"nodeName":"TR","localName":"tr","nodeValue":"","childNodeCount":2,"children":[{"nodeId":30465,"parentId":30464,"backendNodeId":18,"nodeType":1,"nodeName":"TD","localName":"td","nodeValue":"","childNodeCount":0,"children":[],"attributes":[]},{"nodeId":30466,"parentId":30464,"backendNodeId":19,"nodeType":1,"nodeName":"TD","localName":"td","nodeValue":"","childNodeCount":1,"children":[{"nodeId":30467,"parentId":30466,"backendNodeId":20,"nodeType":3,"nodeName":"#text","localName":"","nodeValue":"jim"}],"attributes":[]}],"attributes":[]}],"attributes":[]}],"attributes":["class","itable","border","1","cellspacing","0","width","300px","height","150"]},{"nodeId":30468,"parentId":30456,"backendNodeId":21,"nodeType":1,"nodeName":"TABLE","localName":"table","nodeValue":"","childNodeCount":1,"children":[{"nodeId":30469,"parentId":30468,"backendNodeId":22,"nodeType":1,"nodeName":"TBODY","localName":"tbody","nodeValue":"","childNodeCount":2,"children":[{"nodeId":30470,"parentId":30469,"backendNodeId":23,"nodeType":1,"nodeName":"TR","localName":"tr","nodeValue":"","childNodeCount":2,"children":[{"nodeId":30471,"parentId":30470,"backendNodeId":24,"nodeType":1,"nodeName":"TD","localName":"td","nodeValue":"","childNodeCount":1,"children":[{"nodeId":30472,"parentId":30471,"backendNodeId":25,"nodeType":3,"nodeName":"#text","localName":"","nodeValue":"id"}],"attributes":[]},{"nodeId":30473,"parentId":30470,"backendNodeId":26,"nodeType":1,"nodeName":"TD","localName":"td","nodeValue":"","childNodeCount":1,"children":[{"nodeId":30474,"parentId":30473,"backendNodeId":27,"nodeType":3,"nodeName":"#text","localName":"","nodeValue":"username"}],"attributes":[]}],"attributes":[]},{"nodeId":30475,"parentId":30469,"backendNodeId":28,"nodeType":1,"nodeName":"TR","localName":"tr","nodeValue":"","childNodeCount":2,"children":[{"nodeId":30476,"parentId":30475,"backendNodeId":29,"nodeType":1,"nodeName":"TD","localName":"td","nodeValue":"","childNodeCount":0,"children":[],"attributes":[]},{"nodeId":30477,"parentId":30475,"backendNodeId":30,"nodeType":1,"nodeName":"TD","localName":"td","nodeValue":"","childNodeCount":0,"children":[],"attributes":[]}],"attributes":[]}],"attributes":[]}],"attributes":["class","itable","border","1","cellspacing","0","width","300px","height","150"]},{"nodeId":30478,"parentId":30456,"backendNodeId":31,"nodeType":3,"nodeName":"#text","localName":"","nodeValue":"select * from users where id = 1select * from users where id = 2"},{"nodeId":30479,"parentId":30456,"backendNodeId":32,"nodeType":1,"nodeName":"WEBSCAN","localName":"webscan","nodeValue":"","childNodeCount":0,"children":[],"attributes":[]}],"attributes":[]}],"attributes":[],"frameId":"374820F555469428D6636693E4F63022"}],"documentURL":"http://xss.php%3Cwebscan%3E%3C/webscan%3E","baseURL":"http://xss.php%3Cwebscan%3E%3C/webscan%3E","xmlVersion":""}}}
 ```
 3、	通过解析DOM.getDocument的return里的 nodeValue来判断payload是否存在于最后渲染的页面里。
@@ -173,12 +173,13 @@ Page.navigate命令
 一些细节
 
 1、	如何触发事件的弹窗，通过遍历dom树触发事件来触发onerror=alert之类的弹窗
-![](media/15313231448237/15313250832600.jpg)
 
+![-w934](media/15313231448237/15313273486129.jpg)
 
 2、	如何支持post请求：
 
-![](media/15313231448237/15313250901063.jpg)
+![-w1015](media/15313231448237/15313273090023.jpg)
+
 
 chrome远程调试的配置：
 ```
@@ -186,13 +187,19 @@ chrome-canary --remote-debugging-port=9222 --headless -remote-debugging-address=
 ```
 这里关闭了xss-auditor 和安全相关的一些参数。所以事实上如果不对参数进行处理部署在内网可能会导致ssrf的情况。
 
-最后的效果：
 三种不同的判断逻辑的结果：
-![](media/15313231448237/15313252031580.jpg)
+scan_result结果：
 
-![](media/15313231448237/15313251926626.jpg)
+```json
+# level 3 代表触发了Page.javascriptDialogOpening事件
+{'url': u'http://xss.php', 'vul': 'xss', 'post': '', 'method': u'GET', 'level': '3'}
+# level 2 代表dom树的节点包含了我们自定义的<webscan></webscan>标签
+{'url': u'http://xss.php', 'vul': 'xss', 'post': '', 'method': u'GET', 'level': '2'}
+# level 1 代表渲染后的nodeValue包含我们的payload
+{'url': u'http://xss.php', 'vul': 'xss', 'post': u'id1=1&id2=2test_test', 'method': u'POST', 'level': '1'}
+```
 
-![](media/15313231448237/15313251967919.jpg)
+
 
 ##总结及思考
 1、	其实使用websocket和chrome进行通信整个过程是异步的，使用异步的方法可以解决粗暴的通过超时来控制循环监听的问题，同时也能提高扫描效率。
