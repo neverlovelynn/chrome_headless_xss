@@ -222,5 +222,5 @@ scan_result结果：
 
 2、	在关闭了同源策略的情况下，可能会导致内网ssrf，所以要对传入参数进行处理。可以尝试用其他方法实现post请求，如在Network.requestWillBeSent时修改请求参数。
 
-3、	由于企业内部对qps有限制，我们扫描的payload数量会被限制的很少。不能进行fuzz，如果需要fuzz模块可以参考 https://github.com/bsmali4/xssfork 的fuzz模块进行payload的fuzz。
+3、	由于企业内部对qps有限制，我们扫描的payload数量会被限制的很少。不能进行fuzz，如果需要fuzz模块可以参考 https://github.com/bsmali4/xssfork 的fuzz模块进行payload的fuzz。另外我有一个想法就是既然能得到最后的dom，是否能通过对指纹上下文进行分析自动生成精准的payload。但是想了很久也没想到优雅的实现方式。
 
