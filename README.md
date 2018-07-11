@@ -112,8 +112,11 @@ fridayy的基于phantomjs的xss扫描https://paper.seebug.org/93/
 ```
 几个关键的url：
 http://localhost:9222/json
+
 http://localhost:9222/json/new 
+
 http://localhost:9222/json/close/tab_id
+
 
 其中第一个 URL 是获取当前所有打开的 TAB 页，第二个是新建一个 TAB 页，第三个是根据 TAB 页的 id 关闭这个 TAB 页。 当我们请求第一个 URL 时，返回的内容大概如下：
 ```
