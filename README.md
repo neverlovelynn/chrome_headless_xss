@@ -30,7 +30,7 @@ $ sudo yum install google-chrome-stable
 ```
 nohup google-chrome-stable --disable-gpu --remote-debugging-port=9222 --headless -remote-debugging-address=0.0.0.0 --disable-xss-auditor --no-sandbox --disable-web-security > chromeheadless.out 2>&1 & 
 ```
-chrome_headless_python
+chrome_headless_xss
 ```
 # tmp_url为添加payload的url，如果是post请求则为原始url
 chrome_headless_drive = ChromeHeadLess(url=tmp_url,
@@ -177,7 +177,7 @@ Page.navigate命令
 ```
 3、	通过解析DOM.getDocument的return里的 nodeValue来判断payload是否存在于最后渲染的页面里。
 
-一些细节
+一些细节:
 
 1、	如何触发事件的弹窗，通过遍历dom树触发事件来触发onerror=alert之类的弹窗
 
