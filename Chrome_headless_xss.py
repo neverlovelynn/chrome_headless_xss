@@ -71,7 +71,7 @@ def low_level_check(result_json, payload, result_list):
 
 
 class ChromeHeadLess(object):
-    def __init__(self, url, ip="127.0.0.1", port="9222", cookie="", post="", auth="", payload =""):
+    def __init__(self, url, ip="127.0.0.1", port="9222", cookie="", post="", auth="", payload="", check_message=""):
         """
         初始化
         :param url: 请求url
@@ -95,6 +95,9 @@ class ChromeHeadLess(object):
         self.javascript_dialog_events = []
         self.payload = payload
         self.dom_result = []
+        self.check_message =check_message
+        self.request_id = []
+        self.response_body = []
         chrome_web = "http://%s:%s/json/new" % (ip, port)
         try:
             response = requests.get(chrome_web)
@@ -102,9 +105,7 @@ class ChromeHeadLess(object):
             self.tab_id = response.json().get("id")
             self.soc = websocket.create_connection(self.ws_url)
             self.soc.settimeout(2)
-            # print(self.ws_url, self.tab_id)
         except Exception, e:
-            # print "ERROR:%s" % e
             self.error = str(e)
 
     def close_tab(self):
@@ -148,6 +149,7 @@ class ChromeHeadLess(object):
         })
         self.soc.send(navcom)
 
+
     def get_chrome_msg(self):
         """
         循环监听
@@ -156,6 +158,7 @@ class ChromeHeadLess(object):
         # 对整体请求设置最大延迟时间，
         out_time = 4
         start_time = time.time()
+
 
         while (time.time() - start_time) < out_time:
             try:
@@ -176,19 +179,31 @@ class ChromeHeadLess(object):
                             "vul": "",
                             "level": "0"
                         })
+                    self.request_id.append(result_json["params"]['requestId'])
 
+                #  如果第一个返回包的content-type是json，则直接判断没有漏洞（忽略特定版本ie的情况）
 
+                if "Network.responseReceived" in result:
+                    self.response_body.append(result_json['params']['response'])
+                    if 'application/json' in self.response_body[0]['headers']["Content-Type"]:
+                        break
 
                 elif "Page.javascriptDialogOpening" in result:
                     # hook alert
                     if result_json["params"] not in self.javascript_dialog_events:
                         self.javascript_dialog_events.append(result_json["params"])
-                        for item in self.hook_urls:
-                            if item["url"] in result_json['params']['url']:
-                                item["vul"] = "xss"
-                                item["level"] = "3"
-                    break
 
+                        if result_json["params"]["message"] == self.check_message:
+                            if result_json["params"]["url"] != 'about:blank':
+                                for item in self.hook_urls:
+                                    if item["url"] in result_json['params']['url']:
+                                        item["vul"] = "xss"
+                                        item["level"] = "3"
+                                        break
+                            else:
+                                self.hook_urls[0]['vul']= "xss"
+                                self.hook_urls[0]['level'] = "3"
+                                break
 
                 elif "Page.domContentEventFired" in result:
                     # dom加载完以后 执行on事件的javascript
@@ -236,16 +251,12 @@ class ChromeHeadLess(object):
 
             # 启用网络跟踪，现在将网络事件传递给客户端
             self.send_msg(id=2, method="Network.enable", params={})
-
             # Enables page domain notifications.
             self.send_msg(id=3, method="Page.enable", params={})
-
             # Enables reporting of execution contexts creation by means of executionContextCreated event. When the
             # reporting gets enabled the event will be sent immediately for each existing execution context.
             self.send_msg(id=4, method="Runtime.enable", params={})
-
             # Navigates current page to the given URL.
-
             if self.post != "":
                 (self.send_msg(id=6, method="Runtime.evaluate",
                                params={"expression": "httpRequest = new XMLHttpRequest();"
@@ -259,9 +270,6 @@ class ChromeHeadLess(object):
                                                      "\nhttpRequest.send(\"%s\");"
                                                      "\n'ok';"
                                                      "" % (self.url, self.post)}))
-
-                # self.send_msg(id=5, method="DOM.getDocument", params={"depth": -1})
-
             else:
                 self.send_msg(id=6, method="Page.navigate", params={"url": self.url})
 
@@ -287,6 +295,9 @@ if __name__ == '__main__':
                                            cookie="",
                                            post="",
                                            auth="",
-                                           payload='''test_test''')
+                                           payload='''test_test''',
+                                           check_message="your_alert_touch")
+
     resutl = chrome_headless_drive.run()
+
     print resutl[0]

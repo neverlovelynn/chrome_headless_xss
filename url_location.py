@@ -20,7 +20,7 @@ def check_url_location(result_list, payload):
     i = 1
     if list_len != 0:
         while (i <list_len):
-           if payload in tmp_list[i]['url']:
+           if tmp_list[i]['url'].startswith(payload):
                tmp_list[0]['vul'] = 'url_location'
            i += 1
     else:
@@ -197,6 +197,7 @@ if __name__ == '__main__':
                                                payload="http://www.baidu.com")
 
     test = chrome_headless_drive.run()
+    print test[0]
 
 
 
