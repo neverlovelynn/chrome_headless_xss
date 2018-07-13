@@ -57,4 +57,8 @@ scan_result结果：
 ```
 https://github.com/neverlovelynn/chrome_headless_xss/
 ```
+文章链接:
+```
+https://blog.formsec.cn/2018/07/12/%E5%9F%BA%E4%BA%8EChrome-headless%E7%9A%84XSS%E6%A3%80%E6%B5%8B/
+```
 
