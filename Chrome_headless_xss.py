@@ -44,43 +44,35 @@ def dict_generator(indict, pre=None):
     else:
         yield indict
 
+# 解析json获得包含payload的node_id
 
-# 对标签以及直接在源码中找到指纹信息的xss进行判断
+def get_node_info(root, target):
+    tmp = []
 
-def low_level_check(result_json, payload, result_list):
+    def get_node_id(root, target, tmp):
+        node_value = root.get('nodeValue')
+        if target not in node_value:
+            if 'children' in root:
+                children = root.get('children')
+                if children:
+                    for item in children:
+                        get_node_id(item, target=target, tmp=tmp)
+        else:
+            node_id = root.get('nodeId')
+            node_backend_id = root.get('backendNodeId')
+            dict_tmp = {"node_value": node_value, "node_id": node_id, "node_backend_id": node_backend_id}
+            tmp.append(dict_tmp)
 
-    json = result_json
-    for i in dict_generator(json):
-        if i[-2] == 'localName' and i[-1] == 'webscan':
+    get_node_id(root, target, tmp=tmp)
 
-            if len(result_list)!= 0:
-                if result_list[0]['level']!= '3':
-                    result_list[0]['vul'] = 'xss'
-                    result_list[0]['level'] = '2'
-                else:
-                    pass
+    return tmp
 
-        if i[-2] == 'nodeValue' and payload in i[-1]:
-            if len(result_list)!= 0:
-                if result_list[0]['level'] != '3' and result_list[0]['level'] != '2':
-                    result_list[0]['vul'] = 'xss'
-                    result_list[0]['level'] = '1'
-            else:
-                pass
 
 
 
 class ChromeHeadLess(object):
     def __init__(self, url, ip="127.0.0.1", port="9222", cookie="", post="", auth="", payload="", check_message=""):
-        """
-        初始化
-        :param url: 请求url
-        :param ip: ChromeHeadless的server ip
-        :param port: ChromeHeadless的server 端口
-        :param cookie: 请求cookie
-        :param post:  请求post Chrome的api不支持
-        :param auth:  请求 authorization
-        """
+
         self.url = url
         self.cookie = cookie
         self.post = post
@@ -149,6 +141,67 @@ class ChromeHeadLess(object):
         })
         self.soc.send(navcom)
 
+    # 对插入的自定义标签进行判断,如果存在则判断存在level2等级的xss
+
+    def level_2_check(self, result_json, result_list):
+
+        tmp_json = result_json
+
+        for i in dict_generator(tmp_json):
+            if i[-2] == 'localName' and i[-1] == 'webscan':
+
+                if len(result_list) != 0:
+                    if result_list[0]['level'] != '3':
+                        result_list[0]['vul'] = 'xss'
+                        result_list[0]['level'] = '2'
+                    else:
+                        pass
+
+    # 判断payload是否存在dom树的nodeValue中
+    def node_value_check(self, result_json, payload):
+        flag =False
+        tmp_json = result_json
+        for i in dict_generator(tmp_json):
+            if i[-2] == 'nodeValue' and payload in i[-1]:
+                flag = True
+        return flag
+
+
+
+
+    # 对payload最后在html渲染后的结果，通过outHtml的结果判断是否在服务端进行了实体编码
+
+    def level_1_check(self, payload, result_list):
+        out_time = 4
+        start_time = time.time()
+        while (time.time() - start_time) < out_time:
+            try:
+                result = self.soc.recv()
+                result_json = dict(json.loads(result))
+                if '''"id":2324''' in result:
+                    node_id_list =[]
+                    tmp_node_id = get_node_info(result_json['result']['root'], self.payload)
+                    for item in tmp_node_id:
+                        node_id_list.append(item['node_id'])
+                    print tmp_node_id
+                    for item in node_id_list:
+                        node_id = item
+                        self.send_msg(id=2325, method="DOM.getOuterHTML", params={'nodeId': node_id})
+
+                if '''"id":2325''' in result:
+                    print result
+                    if payload in result_json['result']['outerHTML']:
+                        result_list[0]['vul'] = 'xss'
+                        result_list[0]['level'] = '1'
+                    else:
+                        pass
+            except Exception, e:
+                self.error = e
+                print self.error
+
+
+
+
 
     def get_chrome_msg(self):
         """
@@ -158,7 +211,6 @@ class ChromeHeadLess(object):
         # 对整体请求设置最大延迟时间，
         out_time = 4
         start_time = time.time()
-
 
         while (time.time() - start_time) < out_time:
             try:
@@ -180,6 +232,7 @@ class ChromeHeadLess(object):
                             "level": "0"
                         })
                     self.request_id.append(result_json["params"]['requestId'])
+                    # self.send_msg()
 
                 #  如果第一个返回包的content-type是json，则直接判断没有漏洞（忽略特定版本ie的情况）
 
@@ -229,7 +282,10 @@ class ChromeHeadLess(object):
                                                          "\n}"
                                                          "\n'ok';"})
 
+
                 self.send_msg(id=2324, method="DOM.getDocument", params={"depth": -1})
+
+
 
                 if'''"id":2324''' in result:
 
@@ -276,18 +332,22 @@ class ChromeHeadLess(object):
                 # Executes querySelectorAll on a given node.
 
             self.get_chrome_msg()
-
             if self.dom_result:
+                node_value_flage = False
                 for item in self.dom_result:
-                    low_level_check(item, self.payload, self.hook_urls)
+                    self.level_2_check(item, self.hook_urls)
+                    if self.node_value_check(item, self.payload):
+                        node_value_flage = True
 
-
+                if node_value_flage:
+                    if self.hook_urls[0]['vul'] != 'xss' and self.hook_urls[0]['level'] == '0':
+                        self.level_1_check(self.payload, self.hook_urls)
             self.close_tab()
         else:
             self.close_tab()
             self.error = "get websocket err!"
 
-        return self.hook_urls[0], self.javascript_dialog_events, self.dom_result[-1]
+        return self.hook_urls[0], self.javascript_dialog_events, self.dom_result
 
 if __name__ == '__main__':
     chrome_headless_drive = ChromeHeadLess(url="http://xss.php",
