@@ -333,13 +333,13 @@ class ChromeHeadLess(object):
 
             self.get_chrome_msg()
             if self.dom_result:
-                node_value_flage = False
+                node_value_flag = False
                 for item in self.dom_result:
                     self.level_2_check(item, self.hook_urls)
                     if self.node_value_check(item, self.payload):
-                        node_value_flage = True
+                        node_value_flag = True
 
-                if node_value_flage:
+                if node_value_flag:
                     if self.hook_urls[0]['vul'] != 'xss' and self.hook_urls[0]['level'] == '0':
                         self.level_1_check(self.payload, self.hook_urls)
             self.close_tab()
