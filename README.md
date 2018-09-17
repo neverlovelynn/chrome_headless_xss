@@ -61,4 +61,9 @@ https://github.com/neverlovelynn/chrome_headless_xss/
 ```
 https://blog.formsec.cn/2018/07/12/%E5%9F%BA%E4%BA%8EChrome-headless%E7%9A%84XSS%E6%A3%80%E6%B5%8B/
 ```
+tips:
+  由于最新版本的chrome69在linux下会存在一个 lost ui context的error，所以推荐使用chrome64的稳定版本。历史安装包连接：
+https://www.slimjet.com/chrome/google-chrome-old-version.php
+  有时候也会存在chrome崩溃的情况，也可以使用supervise创建守护进程自动重启。
+
 
